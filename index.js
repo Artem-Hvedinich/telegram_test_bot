@@ -9,6 +9,7 @@ const mainState = {
     userId: 0
 }
 
+
 let dayState = {
     friday: [
         [{text: '00:00-01:00', callback_data: '00:00-01:00'}, {text: '01:00-02:00', callback_data: '01:00-02:00'}],
@@ -39,9 +40,22 @@ let dayState = {
         // [{text: '22:00-23:00', callback_data: '22:00-23:00'}, {text: '23:00-00:00', callback_data: '23:00-00:00'}],
     ]
 }
+
+const adminDay = [
+    [{text: 'Понедельник', callback_data: 'monday'}],
+    [{text: 'Вторник', callback_data: 'tuesday'}],
+    [{text: 'Среда', callback_data: 'wednesday'}],
+    [{text: 'Четверг', callback_data: 'thursday'}],
+    [{text: 'Пятница', callback_data: 'friday',}],
+    [{text: 'Суббота', callback_data: 'saturday'}],
+    [{text: 'Воскресеньеа', callback_data: 'sunday'}],
+
+]
+
 const daysState = {
-    friday: [{text: 'Пятница', callback_data: 'friday',}],
-    saturday: [{text: 'Суббота', callback_data: 'saturday'}]
+    friday: [{text: 'Пятница', callback_data: 'friday'}],
+    saturday: [{text: 'Суббота', callback_data: 'saturday'}],
+    sunday: [{text: 'Воскресеньеа', callback_data: 'sunday'}],
 }
 
 
@@ -80,43 +94,67 @@ async function setUserName(msg) {
 }
 
 const start = async () => {
-    await bot.setMyCommands([
-        {command: '/start', description: 'Начать'},
-    ])
+    let chartId;
+    const commandArr = [{command: '/start', description: 'Запуск'},]
+
+    await bot.setMyCommands(commandArr)
 
     await bot.on('message', msg => {
-        if (msg.text === '/start') return setDays(msg.chat.id)
+        console.log(msg)
+        if (msg.text === '/start') {
+            return setDays(msg.chat.id)
+        }
+        if (msg.text === 'Админ Password') {
+            return bot.sendMessage(msg.chat.id, 'Вы администратор',
+                {
+                    reply_markup: JSON.stringify({
+                        keyboard: [
+                            [{text: 'Изменить время', callback_data: 'refactor_time'}],
+                            [{text: 'Удалить пользователя', callback_data: 'refactor_time'}],
+                        ]
+                    })
+                })
+        }
         return bot.sendMessage(msg.chat.id, 'Я не так умен')
     })
 
     await bot.on('callback_query', async (msg) => {
-
-            if (msg.data === 'friday' || msg.data === 'saturday') {
-                await setTime(msg)
-            } else if (msg.data) {
-                let newArr
-                for (let i = 0; i < dayState[mainState.day].length; i++) {
-                    dayState = {
-                        ...dayState,
-                        [mainState.day]: dayState[mainState.day]
-                            .map((m, i) => [...m.filter(f => f.text !== msg.data)]).filter(j => j.length > 0)
-                    }
-                }
-                console.log(dayState)
-
-
-                mainState.time = msg.data
-                mainState.userId = msg.message.chat.id
-                await setUserName(msg)
-                if (mainState.day && mainState.userName && mainState.userId && mainState.time) {
-                    bot.sendMessage(msg.message.chat.id, `Ваше "${mainState.userName}" время: ${daysState[mainState.day][0].text} ${mainState.time}`)
-                }
-                // if (!mainState.day || !mainState.userName || !mainState.userId || !mainState.time) {
-                // console.log(mainState)
-                // !mainState.day && await setDays(msg.message.chat.id)
-                // !mainState.time && await setTime(msg.message.chat.id)
-            }
+        console.log(msg)
+        if (msg.data === 'refactor_time') {
+            return bot.sendMessage(msg.message.chat.id, 'Выберите день', {
+                reply_markup: JSON.stringify({
+                    inline_keyboard: adminDay
+                })
+            })
         }
-    )
+        if (msg.data === 'friday' || msg.data === 'saturday') {
+            await setTime(msg)
+        } else if (msg.data) {
+            for (let i = 0; i < dayState[mainState.day].length; i++) {
+                dayState = {
+                    ...dayState,
+                    [mainState.day]: dayState[mainState.day]
+                        .map((m, i) => [...m.filter(f => f.text !== msg.data)]).filter(j => j.length > 0)
+                }
+            }
+            console.log(dayState)
+
+
+            mainState.time = msg.data
+            mainState.userId = msg.message.chat.id
+            await setUserName(msg)
+            if (mainState.day && mainState.userName && mainState.userId && mainState.time) {
+                bot.sendMessage(msg.message.chat.id, `Ваше "${mainState.userName}" время: ${daysState[mainState.day][0].text} ${mainState.time}`)
+            }
+            // if (!mainState.day || !mainState.userName || !mainState.userId || !mainState.time) {
+            // console.log(mainState)
+            // !mainState.day && await setDays(msg.message.chat.id)
+            // !mainState.time && await setTime(msg.message.chat.id)
+        }
+    })
+
+    await bot.on('inline_query', async msg => {
+        console.log(msg)
+    })
 }
 start()
