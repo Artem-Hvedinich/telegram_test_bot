@@ -1,5 +1,6 @@
 const TelegramApi = require('node-telegram-bot-api')
-const token = '5406818198:AAFnYqov3E3eMc3LyZMY5TQGw4YhrVDRW-c'
+const token = '5652411612:AAE82FMCLlF7PS5pPoWnli7HOtmj4-LKpFs'
+
 
 const bot = new TelegramApi(token, {polling: true})
 const mainState = {
@@ -41,16 +42,16 @@ let dayState = {
     ]
 }
 
-const adminDay = [
-    [{text: 'Понедельник', callback_data: 'monday'}],
-    [{text: 'Вторник', callback_data: 'tuesday'}],
-    [{text: 'Среда', callback_data: 'wednesday'}],
-    [{text: 'Четверг', callback_data: 'thursday'}],
-    [{text: 'Пятница', callback_data: 'friday',}],
-    [{text: 'Суббота', callback_data: 'saturday'}],
-    [{text: 'Воскресеньеа', callback_data: 'sunday'}],
-
-]
+// const adminDay = [
+//     [{text: 'Понедельник', callback_data: 'monday'}],
+//     [{text: 'Вторник', callback_data: 'tuesday'}],
+//     [{text: 'Среда', callback_data: 'wednesday'}],
+//     [{text: 'Четверг', callback_data: 'thursday'}],
+//     [{text: 'Пятница', callback_data: 'friday',}],
+//     [{text: 'Суббота', callback_data: 'saturday'}],
+//     [{text: 'Воскресеньеа', callback_data: 'sunday'}],
+//
+// ]
 
 const daysState = {
     friday: [{text: 'Пятница', callback_data: 'friday'}],
@@ -64,6 +65,7 @@ function setDays(charId) {
     if (dayState.friday.length > 0 || dayState.saturday.length > 0) {
         if (dayState.friday.length > 0) daysItems.push(daysState.friday)
         if (dayState.saturday.length > 0) daysItems.push(daysState.saturday)
+
         return bot.sendMessage(charId, 'Выберите день',
             {
                 reply_markup: JSON.stringify({
@@ -103,17 +105,6 @@ const start = async () => {
         console.log(msg)
         if (msg.text === '/start') {
             return setDays(msg.chat.id)
-        }
-        if (msg.text === 'Админ Password') {
-            return bot.sendMessage(msg.chat.id, 'Вы администратор',
-                {
-                    reply_markup: JSON.stringify({
-                        keyboard: [
-                            [{text: 'Изменить время', callback_data: 'refactor_time'}],
-                            [{text: 'Удалить пользователя', callback_data: 'refactor_time'}],
-                        ]
-                    })
-                })
         }
         return bot.sendMessage(msg.chat.id, 'Я не так умен')
     })

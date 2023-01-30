@@ -5,12 +5,16 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "notion": "node notion.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@notionhq/client": "^2.2.3",
+    "axios": "^1.2.6",
+    "dotenv": "^16.0.3",
     "node-telegram-bot-api": "^0.60.0",
     "nodemon": "^2.0.20"
   }
